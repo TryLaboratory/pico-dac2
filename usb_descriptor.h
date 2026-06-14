@@ -43,9 +43,9 @@ static const struct usb_device_descriptor device_descriptor = {
     .idVendor = VENDOR_ID,    // Your vendor id
     .idProduct = PRODUCT_ID,  // Your product ID
     .bcdDevice = 0,           // No device revision number
-    .iManufacturer = 0,       // Manufacturer string index
-    .iProduct = 0,            // Product string index
-    .iSerialNumber = 0,       // No serial number
+    .iManufacturer = 1,       // Manufacturer string index
+    .iProduct = 2,            // Product string index
+    .iSerialNumber = 3,       // No serial number
     .bNumConfigurations = 1   // One configuration
 };
 
