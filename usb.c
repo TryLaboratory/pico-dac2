@@ -317,26 +317,67 @@ static void usb_handle_standard_request(const struct usb_setup_packet_t* pkt) {
                     (uint8_t*)&configuration_descriptor,
                     MIN(pkt->wLength, sizeof(configuration_descriptor)));
                 return;
-              case USB_DT_STRING:
-                static const uint8_t dummy_string_descriptor[] = {
-                    // Header
-                    12,
-                    USB_DT_STRING,  // bDescriptorType: 0x03
-                    'd',
-                    0,
-                    'u',
-                    0,
-                    'm',
-                    0,
-                    'm',
-                    0,
-                    'y',
-                    0,
-                };
-                usb_ep0_start_transfer(
-                    dummy_string_descriptor,
-                    MIN(pkt->wLength, sizeof(dummy_string_descriptor)));
-                return;
+              case USB_DT_STRING: {
+    uint8_t str_index = pkt->wValue & 0xFF;
+
+    static const uint8_t str0[] = {
+        0x04, 0x03,
+        0x09, 0x04
+    };
+
+    static const uint8_t str1[] = {
+        0x10, 0x03,
+        'R',0,'P',0,'i',0,'C',0,'o',0,'r',0,'p',0
+    };
+
+    static const uint8_t str2[] = {
+        0x14, 0x03,
+        'U',0,'S',0,'B',0,' ',0,
+        'A',0,'u',0,'d',0,'i',0,'o',0
+    };
+
+    static const uint8_t str3[] = {
+        0x0A, 0x03,
+        '0',0,'0',0,'0',0,'1',0
+    };
+
+    const uint8_t* str = NULL;
+    uint8_t str_len = 0;
+
+    switch (str_index) {
+        case 0:
+            str = str0;
+            str_len = sizeof(str0);
+            break;
+
+        case 1:
+            str = str1;
+            str_len = sizeof(str1);
+            break;
+
+        case 2:
+            str = str2;
+            str_len = sizeof(str2);
+            break;
+
+        case 3:
+            str = str3;
+            str_len = sizeof(str3);
+            break;
+
+        default:
+            usb_ep0_stall();
+            return;
+    }
+
+    usb_ep0_start_transfer(
+        str,
+        MIN(pkt->wLength, str_len));
+
+    return;
+}
+
+
               case USB_DT_QUALIFIER:
                 // Full-Speed 専用のため stall
                 usb_ep0_stall();
